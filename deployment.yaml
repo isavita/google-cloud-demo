@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ruby-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: google-cloud-demo
+    spec:
+      containers:
+      - name: google-cloud-demo
+        image: gcr.io/$PROJECT/google-cloud-demo:latest
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        env:
+          - name: DB_HOST
+            value: $DB_HOST
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ruby-credentials
+                key: database_user
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ruby-credentials
+                key: database_password
+          - name: SECRET_KEY_BASE
+            valueFrom:
+              secretKeyRef:
+                name: ruby-credentials
+                key: secret_key_base
