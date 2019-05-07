@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: google-cloud-demo
-        image: gcr.io/$PROJECT/google-cloud-demo:latest
+        image: gcr.io/heroku-app-239910/google-cloud-demo:latest
         ports:
         - containerPort: 8080
         livenessProbe:
