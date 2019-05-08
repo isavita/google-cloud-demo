@@ -1,25 +1,63 @@
-# README
+# Google Cloud Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### Create a Dockerfile for production build
 
-Things you may want to cover:
+  `docker build -t <IMAGE-NAME> .`
 
-* Ruby version
+  e.g. `docker build -t google-cloud-demo-app .`
 
-* System dependencies
+### Configure docker to use gcloud authorization
 
-* Configuration
+  `gcloud auth configure-docker --quiet`
 
-* Database creation
+### Get the `PROJECT_ID`
 
-* Database initialization
+  `gcloud config get-value project`
 
-* How to run the test suite
+  e.g.
+  ```shell
+    PROJECT_ID=$(gcloud config get-value project)
+    echo $PROJECT_ID
+  ```
 
-* Services (job queues, cache servers, search engines, etc.)
+### Change to a different project
 
-* Deployment instructions
+  `gcloud config set project <PROJECT-ID>`
 
-* ...
-# google-cloud-demo
+  e.g. `gcloud config set project myproject-app-123456`
+
+### Add the registry name as a tag to the container image
+
+  `docker tag <IMAGE-NAME>:<VERSION> gcr.io/<PROJECT-ID>/<IMAGE-NAME>`
+
+  e.g. `docker tag google-cloud-demo-app:latest gcr.io/$PROJECT_ID/google-cloud-demo-app`
+
+### Push the image to google cloud container registry
+
+  `docker push gcr.io/<PROJECT-ID>/<IMAGE-NAME>`
+
+  e.g. `docker push gcr.io/$PROJECT_ID/google-cloud-demo-app`
+
+### Store project secrets in secret object on google cloud
+
+  `kubectl create secret generic <SECRET-PROJECT-NAME> --from-literal=<KEY>=<VALUE>`
+
+  e.g.
+  ```shell
+    kubectl create secret generic google-cloud-demo-app-credentials \
+      --from-literal=user="$DATABASE_USER" \
+      --from-literal=password="$DATABASE_PASSWORD" \
+      --from-literal secret_key_base="$SECRET_KEY_BASE"
+  ```
+
+### Migrate data from Heroku Postgres to Cloud SQL with a streaming migration
+
+  ```shell
+  heroku pg:pull <HEROKU-DATABASE-URL> \
+    postgres://<GC-DATABASE-USER>@<GC-DATABASE-HOST>/<GC-DATABASE-NAME> \
+    --app <HEROKU-APP>
+  ```
+
+### Useful links
+
+  * [How to migrate rails project from heroku to google cloud](https://cloud.google.com/solutions/migrating-ruby-on-rails-apps-on-heroku-to-gke)
