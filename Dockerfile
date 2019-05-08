@@ -10,7 +10,7 @@ RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - && \
 
 # Copy application files and install the bundle
 WORKDIR /app
-COPY Gemfile* ./
+COPY Gemfile Gemfile.lock ./
 RUN bundle install
 COPY . .
 
